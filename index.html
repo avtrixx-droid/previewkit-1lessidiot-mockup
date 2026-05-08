@@ -1,0 +1,2188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PreviewKit — F1 Phone Case Customizer (Vendor Mockup)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --surface2: #1c1c27;
+      --border: #2a2a3a;
+      --border-light: #383850;
+      --accent: #e8003d;
+      --accent2: #ff6b00;
+      --text: #f0f0f8;
+      --text-muted: #8888aa;
+      --text-dim: #5555770;
+      --green: #00c87a;
+      --yellow: #ffd200;
+      --blue: #1e90ff;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── TOP BAR ── */
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 18px;
+      color: var(--text);
+    }
+    .topbar-brand .dot {
+      width: 28px; height: 28px;
+      background: var(--accent);
+      border-radius: 7px;
+      display: grid;
+      place-items: center;
+      font-size: 14px;
+      font-weight: 900;
+      color: #fff;
+    }
+    .topbar-badge {
+      background: rgba(232,0,61,0.15);
+      border: 1px solid rgba(232,0,61,0.3);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .topbar-right span {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .topbar-right strong {
+      color: var(--text);
+    }
+
+    /* ── STEP PROGRESS ── */
+    .step-progress {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+    }
+    .step-list {
+      display: flex;
+      align-items: stretch;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .step-item {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 0;
+      position: relative;
+      cursor: pointer;
+      opacity: 0.45;
+      transition: opacity 0.2s;
+    }
+    .step-item.active { opacity: 1; }
+    .step-item.done { opacity: 0.75; cursor: pointer; }
+    .step-item + .step-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 1px;
+      height: 30px;
+      background: var(--border);
+    }
+    .step-num {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--border-light);
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .step-item.active .step-num {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .step-item.done .step-num {
+      background: var(--green);
+      border-color: var(--green);
+      color: #fff;
+    }
+    .step-item.done .step-num::after { content: '✓'; font-size: 14px; }
+    .step-item.done .step-num span { display: none; }
+    .step-label { font-size: 13px; font-weight: 600; color: var(--text); }
+    .step-sublabel { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    /* ── SCREEN WRAPPER ── */
+    .screens { position: relative; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ────────────────────────────────────────
+       STEP 1 — PRODUCT SELECTION
+    ──────────────────────────────────────── */
+    .s1-wrap {
+      max-width: 1100px;
+      margin: 48px auto;
+      padding: 0 32px;
+    }
+    .s1-header { text-align: center; margin-bottom: 40px; }
+    .eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+    .s1-header h1 {
+      font-size: 36px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+    .s1-header p { color: var(--text-muted); font-size: 16px; }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+    .product-card {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .product-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .product-card.selected { border-color: var(--accent); background: rgba(232,0,61,0.05); }
+    .product-card.selected::after {
+      content: '✓';
+      position: absolute;
+      top: 14px; right: 14px;
+      width: 24px; height: 24px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      color: #fff;
+      font-weight: 700;
+    }
+    .product-img-wrap {
+      height: 200px;
+      display: grid;
+      place-items: center;
+      background: #0a0a12;
+      border-radius: var(--radius-sm);
+      margin-bottom: 18px;
+      overflow: hidden;
+      padding: 16px 0;
+    }
+    .product-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
+    }
+    .product-img-wrap .product-icon {
+      font-size: 72px;
+      opacity: 0.4;
+    }
+    .product-name {
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+    .product-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+    .product-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tag {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 20px;
+      background: var(--surface2);
+      color: var(--text-muted);
+    }
+    .tag.hot { background: rgba(232,0,61,0.15); color: var(--accent); }
+
+    .s1-cta { text-align: center; }
+
+    /* ────────────────────────────────────────
+       STEP 2 — CUSTOMIZATION
+    ──────────────────────────────────────── */
+    .s2-layout {
+      display: grid;
+      grid-template-columns: 1fr 440px;
+      gap: 0;
+      height: calc(100vh - 130px);
+      min-height: 700px;
+    }
+
+    /* Left: Preview panel */
+    .preview-panel {
+      background: #0d0d15;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .preview-toolbar {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface);
+    }
+    .preview-toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .toolbar-btn {
+      width: 34px; height: 34px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-light);
+      background: var(--surface2);
+      color: var(--text-muted);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      font-size: 15px;
+      transition: all 0.15s;
+    }
+    .toolbar-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .toolbar-divider { width: 1px; height: 22px; background: var(--border); margin: 0 4px; }
+    .zoom-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+      min-width: 40px;
+      text-align: center;
+    }
+    .quality-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--green);
+      background: rgba(0,200,122,0.1);
+      border: 1px solid rgba(0,200,122,0.2);
+      padding: 5px 12px;
+      border-radius: 20px;
+    }
+    .quality-badge::before {
+      content: '';
+      width: 7px; height: 7px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: pulse-green 2s infinite;
+    }
+    @keyframes pulse-green {
+      0%,100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .preview-canvas {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      position: relative;
+    }
+    .print-area-wrap {
+      position: relative;
+      width: 320px;
+    }
+    .print-boundary {
+      position: absolute;
+      top: 50px; left: 30px; right: 30px; bottom: 60px;
+      border: 2px dashed rgba(232,0,61,0.4);
+      border-radius: 4px;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .print-boundary-label {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      font-weight: 700;
+      color: rgba(232,0,61,0.6);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    /* ── CSS PHONE CASE (replaces photo) ── */
+    .css-case {
+      width: 100%;
+      aspect-ratio: 9 / 19.5;
+      background: #0b1a35;
+      border-radius: 36px;
+      border: 3px solid rgba(255,255,255,0.10);
+      position: relative;
+      overflow: hidden;
+      display: block;
+      z-index: 1;
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.04),
+        inset 0 -40px 60px rgba(0,0,0,0.25),
+        0 24px 60px rgba(0,0,0,0.55);
+    }
+    .css-case::before {
+      content: '';
+      position: absolute;
+      top: 20px; left: 22px;
+      width: 62px; height: 62px;
+      background: rgba(0,0,0,0.45);
+      border-radius: 20px;
+      border: 2px solid rgba(255,255,255,0.07);
+      box-shadow: inset 0 0 0 3px rgba(0,0,0,0.3);
+    }
+    .css-case::after {
+      content: '';
+      position: absolute;
+      top: 34px; left: 36px;
+      width: 16px; height: 16px;
+      background: #1a1a2e;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.05);
+    }
+    /* Highlight edge */
+    .css-case-shine {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 45%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 100%);
+      border-radius: 34px 34px 0 0;
+      pointer-events: none;
+      z-index: 2;
+    }
+    /* Mini variant for product cards */
+    .css-case-mini {
+      width: 110px;
+      margin: 0 auto;
+      aspect-ratio: 9 / 19.5;
+      background: #0b1a35;
+      border-radius: 22px;
+      border: 2px solid rgba(255,255,255,0.10);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.55);
+    }
+    .css-case-mini::before {
+      content: '';
+      position: absolute;
+      top: 10px; left: 12px;
+      width: 32px; height: 32px;
+      background: rgba(0,0,0,0.4);
+      border-radius: 10px;
+      border: 1.5px solid rgba(255,255,255,0.07);
+    }
+    .css-case-mini-num {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+    }
+    .css-case-mini-num .mini-n {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 46px;
+      font-weight: 700;
+      color: #cc0000;
+      -webkit-text-stroke: 1.5px rgba(255,255,255,0.7);
+      line-height: 1;
+    }
+    .css-case-mini-num .mini-name {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.75);
+      letter-spacing: 0.1em;
+    }
+    .css-case-mini-alt { background: #1a0a00; }
+    .css-case-mini-alt2 { background: #0a0a0a; }
+
+    .case-img {
+      width: 100%;
+      border-radius: 28px;
+      display: block;
+      position: relative;
+      z-index: 1;
+    }
+    .case-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .overlay-number {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 100px;
+      font-weight: 700;
+      line-height: 1;
+      text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+      transition: all 0.2s;
+    }
+    .overlay-name {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      opacity: 0.85;
+      text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
+      transition: all 0.2s;
+    }
+
+    .preview-footer {
+      padding: 12px 20px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .preview-footer-text {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .preview-footer-icon { font-size: 14px; }
+
+    /* Right: Controls panel */
+    .controls-panel {
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .controls-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .controls-header h2 { font-size: 15px; font-weight: 700; }
+    .controls-header p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+    .controls-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .controls-scroll::-webkit-scrollbar { width: 4px; }
+    .controls-scroll::-webkit-scrollbar-track { background: transparent; }
+    .controls-scroll::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 4px; }
+
+    .control-group { display: flex; flex-direction: column; gap: 12px; }
+    .control-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .control-label .char-count {
+      font-weight: 500;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .field-wrap { position: relative; }
+    .field-input {
+      width: 100%;
+      background: var(--surface2);
+      border: 1.5px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .field-input:focus { border-color: var(--accent); }
+    .field-input.error { border-color: #ff4466; }
+    .field-error {
+      font-size: 11px;
+      color: #ff4466;
+      margin-top: 5px;
+      display: none;
+      align-items: center;
+      gap: 4px;
+    }
+    .field-error.visible { display: flex; }
+
+    .font-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    .font-card {
+      background: var(--surface2);
+      border: 2px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+    }
+    .font-card:hover { border-color: var(--border-light); background: #222235; }
+    .font-card.selected { border-color: var(--accent); background: rgba(232,0,61,0.08); }
+    .font-preview {
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+    .font-name {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .color-section { display: flex; flex-direction: column; gap: 10px; }
+    .swatch-grid {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 6px;
+    }
+    .swatch {
+      aspect-ratio: 1;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 2.5px solid transparent;
+      transition: all 0.15s;
+      position: relative;
+    }
+    .swatch:hover { transform: scale(1.1); }
+    .swatch.selected { border-color: #fff; box-shadow: 0 0 0 2px var(--accent); }
+    .hex-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .hex-preview {
+      width: 32px; height: 32px;
+      border-radius: 6px;
+      border: 1.5px solid var(--border-light);
+      flex-shrink: 0;
+    }
+    .hex-input {
+      flex: 1;
+      background: var(--surface2);
+      border: 1.5px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      padding: 7px 12px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      outline: none;
+    }
+    .hex-input:focus { border-color: var(--accent); }
+    .contrast-warn {
+      font-size: 11px;
+      color: var(--yellow);
+      background: rgba(255,210,0,0.1);
+      border: 1px solid rgba(255,210,0,0.25);
+      border-radius: 6px;
+      padding: 6px 10px;
+      display: none;
+      align-items: center;
+      gap: 6px;
+    }
+    .contrast-warn.visible { display: flex; }
+
+    .logo-tabs {
+      display: flex;
+      border: 1.5px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    .logo-tab {
+      flex: 1;
+      padding: 9px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text-muted);
+      background: var(--surface2);
+      transition: all 0.15s;
+    }
+    .logo-tab.active { background: var(--accent); color: #fff; }
+    .logo-upload-zone {
+      border: 2px dashed var(--border-light);
+      border-radius: var(--radius-sm);
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .logo-upload-zone:hover { border-color: var(--accent); background: rgba(232,0,61,0.05); }
+    .upload-icon { font-size: 28px; margin-bottom: 8px; opacity: 0.5; }
+    .upload-text { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+    .upload-btn-text { font-size: 12px; font-weight: 600; color: var(--accent); margin-top: 6px; }
+    .preset-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .preset-logo {
+      background: var(--surface2);
+      border: 2px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 28px;
+      transition: all 0.15s;
+    }
+    .preset-logo:hover { border-color: var(--accent); }
+    .preset-logo.selected { border-color: var(--accent); background: rgba(232,0,61,0.1); }
+
+    .position-grid-wrap { display: flex; flex-direction: column; gap: 8px; }
+    .position-grid-label { font-size: 11px; color: var(--text-muted); }
+    .position-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+      width: 120px;
+    }
+    .pos-cell {
+      aspect-ratio: 1;
+      background: var(--surface2);
+      border: 1.5px solid var(--border-light);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .pos-cell:hover { border-color: var(--accent); }
+    .pos-cell.selected { background: var(--accent); border-color: var(--accent); }
+
+    /* Controls footer */
+    .controls-footer {
+      border-top: 1px solid var(--border);
+      padding: 16px 24px;
+      background: var(--surface);
+    }
+    .order-strip {
+      background: var(--surface2);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .order-strip-item { text-align: center; }
+    .order-strip-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+    .order-strip-value { font-size: 14px; font-weight: 700; margin-top: 2px; }
+    .order-strip-divider { width: 1px; height: 28px; background: var(--border); }
+    .footer-btns { display: flex; gap: 10px; }
+    .btn-ghost {
+      flex: 0 0 auto;
+      padding: 11px 18px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border-light);
+      background: transparent;
+      color: var(--text-muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-ghost:hover { border-color: var(--text-muted); color: var(--text); }
+    .btn-primary {
+      flex: 1;
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-primary:hover { background: #cc0033; }
+
+    /* ────────────────────────────────────────
+       STEP 3 — PREVIEW & CONFIRM
+    ──────────────────────────────────────── */
+    .s3-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 48px 32px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: start;
+    }
+    .s3-preview-side {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .s3-case-wrap {
+      position: relative;
+      border-radius: 28px;
+      overflow: hidden;
+    }
+    .s3-case-wrap .css-case { width: 100%; }
+    .s3-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      pointer-events: none;
+    }
+    .s3-num {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 110px;
+      font-weight: 700;
+      line-height: 1;
+      text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+    }
+    .s3-name {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-shadow: 1px 1px 0 rgba(0,0,0,0.5);
+    }
+    .s3-dpi-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0,200,122,0.1);
+      border: 1px solid rgba(0,200,122,0.25);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: var(--green);
+      font-weight: 600;
+    }
+
+    .s3-confirm-side { display: flex; flex-direction: column; gap: 24px; }
+    .s3-confirm-side h2 { font-size: 22px; font-weight: 800; }
+    .s3-confirm-side p { font-size: 14px; color: var(--text-muted); margin-top: 4px; line-height: 1.6; }
+
+    .checklist { display: flex; flex-direction: column; gap: 1px; }
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+    .checklist-item:first-child { border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
+    .checklist-item:last-child { border-radius: 0 0 var(--radius-sm) var(--radius-sm); }
+    .checklist-item + .checklist-item { border-top: none; }
+    .check-left { display: flex; align-items: center; gap: 10px; }
+    .check-icon { color: var(--green); font-size: 14px; }
+    .check-label { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .check-value { font-size: 14px; font-weight: 600; margin-top: 2px; }
+    .check-edit {
+      font-size: 12px;
+      color: var(--accent);
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .check-edit:hover { text-decoration: underline; }
+
+    .s3-cta-wrap { display: flex; flex-direction: column; gap: 10px; }
+    .btn-large {
+      width: 100%;
+      padding: 16px;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-large:hover { background: #cc0033; }
+    .s3-note {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    /* ────────────────────────────────────────
+       STEP 4 — ADD TO CART
+    ──────────────────────────────────────── */
+    .s4-wrap {
+      max-width: 600px;
+      margin: 60px auto;
+      padding: 0 32px;
+      text-align: center;
+    }
+    .s4-success-ring {
+      width: 88px; height: 88px;
+      border-radius: 50%;
+      background: rgba(0,200,122,0.15);
+      border: 2px solid rgba(0,200,122,0.3);
+      display: grid;
+      place-items: center;
+      margin: 0 auto 24px;
+      font-size: 36px;
+    }
+    .s4-wrap h1 { font-size: 32px; font-weight: 800; margin-bottom: 10px; }
+    .s4-wrap p { font-size: 16px; color: var(--text-muted); margin-bottom: 36px; line-height: 1.6; }
+
+    .s4-summary {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 32px;
+      text-align: left;
+    }
+    .s4-summary-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+    .s4-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    .s4-row:last-child { border-bottom: none; }
+    .s4-row-label { color: var(--text-muted); }
+    .s4-row-val { font-weight: 600; }
+    .s4-price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 16px;
+      margin-top: 8px;
+    }
+    .s4-total { font-size: 16px; font-weight: 700; }
+    .s4-price { font-size: 24px; font-weight: 800; color: var(--accent); }
+
+    .s4-btns { display: flex; flex-direction: column; gap: 12px; }
+    .btn-cart {
+      width: 100%;
+      padding: 16px;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-cart:hover { background: #cc0033; }
+    .btn-outline {
+      width: 100%;
+      padding: 14px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border-light);
+      background: transparent;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-outline:hover { border-color: var(--text-muted); }
+
+    .s4-powered {
+      margin-top: 32px;
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .pk-pill {
+      background: rgba(232,0,61,0.15);
+      border: 1px solid rgba(232,0,61,0.3);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    /* ── VENDOR ANNOTATION BANNER ── */
+    .vendor-banner {
+      background: linear-gradient(135deg, rgba(232,0,61,0.08) 0%, rgba(255,107,0,0.08) 100%);
+      border-bottom: 1px solid rgba(232,0,61,0.2);
+      padding: 10px 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+    }
+    .vendor-banner strong { color: var(--accent); }
+    .vendor-banner span { color: var(--text-muted); }
+    .vb-dot {
+      width: 8px; height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      flex-shrink: 0;
+      animation: pulse-red 2s infinite;
+    }
+    @keyframes pulse-red {
+      0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(232,0,61,0.4); }
+      50% { opacity: 0.8; box-shadow: 0 0 0 6px rgba(232,0,61,0); }
+    }
+
+    /* ── SHARE MODAL ── */
+    .share-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 200;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+      padding: 24px;
+    }
+    .share-backdrop.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .share-modal {
+      background: var(--surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 28px;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 -8px 60px rgba(0,0,0,0.6);
+      transform: translateY(32px);
+      transition: transform 0.3s cubic-bezier(.22,.68,0,1.1);
+      position: relative;
+    }
+    .share-backdrop.visible .share-modal {
+      transform: translateY(0);
+    }
+    .share-modal-close {
+      position: absolute;
+      top: 16px; right: 16px;
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      border: 1px solid var(--border-light);
+      background: var(--surface2);
+      color: var(--text-muted);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+      transition: all 0.15s;
+    }
+    .share-modal-close:hover { border-color: var(--accent); color: var(--accent); }
+    .share-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .share-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .share-preview-strip {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--surface2);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      margin-bottom: 16px;
+    }
+    .share-preview-num {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 36px;
+      font-weight: 700;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .share-preview-details { flex: 1; }
+    .share-preview-name {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+    .share-preview-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+    .share-url-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .share-url-input {
+      flex: 1;
+      background: var(--surface2);
+      border: 1.5px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      color: var(--text-muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      outline: none;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .share-copy-btn {
+      flex-shrink: 0;
+      padding: 10px 18px;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .share-copy-btn:hover { background: #cc0033; }
+    .share-copy-btn.copied { background: var(--green); }
+    .share-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 14px 0;
+    }
+    .share-options {
+      display: flex;
+      gap: 8px;
+    }
+    .share-option-btn {
+      flex: 1;
+      padding: 9px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border-light);
+      background: var(--surface2);
+      color: var(--text-muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .share-option-btn:hover { border-color: var(--border-light); color: var(--text); background: #222235; }
+
+    /* ── TOAST NOTIFICATION ── */
+    .pk-toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--surface);
+      border: 1px solid var(--green);
+      border-radius: 999px;
+      padding: 10px 22px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--green);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 300;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      transition: transform 0.35s cubic-bezier(.22,.68,0,1.1), opacity 0.3s;
+      opacity: 0;
+      white-space: nowrap;
+    }
+    .pk-toast.visible {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* ── RESTORED DESIGN BANNER ── */
+    .restored-banner {
+      background: rgba(0,200,122,0.1);
+      border-bottom: 1px solid rgba(0,200,122,0.2);
+      padding: 10px 32px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--green);
+      display: none;
+    }
+    .restored-banner.visible { display: flex; }
+    .restored-banner strong { font-weight: 700; }
+    .restored-dismiss {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border-light);
+    }
+    .restored-dismiss:hover { color: var(--text); }
+
+    /* ── MOBILE OVERLAY NOTE ── */
+    .mobile-note {
+      display: none;
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      font-size: 12px;
+      color: var(--text-muted);
+      z-index: 50;
+      max-width: 240px;
+      line-height: 1.5;
+    }
+
+    /* Loading shimmer */
+    .shimmer {
+      background: linear-gradient(90deg, var(--surface2) 0%, #2a2a40 50%, var(--surface2) 100%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 6px;
+    }
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    .loading-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(10,10,15,0.7);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      z-index: 10;
+    }
+    .loading-overlay.visible { opacity: 1; pointer-events: all; }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--border-light);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-size: 13px; color: var(--text-muted); }
+
+    @media (max-width: 900px) {
+      .s2-layout { grid-template-columns: 1fr; height: auto; }
+      .preview-panel { height: 55vw; min-height: 280px; }
+      .controls-panel { max-height: 60vh; }
+      .s3-wrap { grid-template-columns: 1fr; }
+      .product-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Restored design banner (shown when loading from shared URL) -->
+<div class="restored-banner" id="restored-banner">
+  ✅ &nbsp;<strong>Design restored</strong> — someone shared this configuration with you. You can edit it freely.
+  <span class="restored-dismiss" onclick="document.getElementById('restored-banner').classList.remove('visible')">Dismiss</span>
+</div>
+
+<!-- Share modal -->
+<div class="share-backdrop" id="share-backdrop" onclick="closeShareModal(event)">
+  <div class="share-modal">
+    <button class="share-modal-close" onclick="closeShareModal(null)">×</button>
+    <div class="share-title">🔗 Share this design</div>
+    <div class="share-sub">Anyone with this link will see your exact configuration — number, name, colours, and font. They can edit it freely before ordering.</div>
+
+    <div class="share-preview-strip">
+      <div class="share-preview-num" id="share-prev-num" style="color:#cc0000;">1</div>
+      <div class="share-preview-details">
+        <div class="share-preview-name" id="share-prev-name">VERSTAPPEN</div>
+        <div class="share-preview-meta" id="share-prev-meta">Racing Bold · #CC0000 · F1 Snap Case</div>
+      </div>
+      <div style="width:38px;height:38px;border-radius:6px;flex-shrink:0;" id="share-color-swatch"></div>
+    </div>
+
+    <div class="share-url-row">
+      <input class="share-url-input" id="share-url-input" readonly />
+      <button class="share-copy-btn" id="share-copy-btn" onclick="copyShareUrl()">Copy link</button>
+    </div>
+
+    <div class="share-divider"></div>
+
+    <div class="share-options">
+      <button class="share-option-btn" onclick="shareViaWhatsApp()">💬 WhatsApp</button>
+      <button class="share-option-btn" onclick="shareViaEmail()">✉️ Email</button>
+      <button class="share-option-btn" onclick="shareNative()">⬆️ More</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast notification -->
+<div class="pk-toast" id="pk-toast">✓ Link copied to clipboard!</div>
+
+<!-- Vendor annotation banner -->
+<div class="vendor-banner">
+  <div class="vb-dot"></div>
+  <strong>Vendor Mockup</strong>
+  <span>— PreviewKit F1 Phone Case Customizer &nbsp;·&nbsp; This is a functional prototype showing the end-to-end buyer flow. All interactions are live.</span>
+</div>
+
+<!-- Top navigation bar -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="dot">P</div>
+    PreviewKit
+    <div class="topbar-badge">F1 Prototype</div>
+  </div>
+  <div class="topbar-right">
+    <span>Vendor preview for <strong>F1 Phone Case Store</strong></span>
+  </div>
+</div>
+
+<!-- Step progress -->
+<div class="step-progress">
+  <div class="step-list">
+    <div class="step-item active" id="step-ind-1" onclick="goStep(1)">
+      <div class="step-num"><span>1</span></div>
+      <div>
+        <div class="step-label">Choose Product</div>
+        <div class="step-sublabel">Pick your F1 case style</div>
+      </div>
+    </div>
+    <div class="step-item" id="step-ind-2" onclick="goStep(2)">
+      <div class="step-num"><span>2</span></div>
+      <div>
+        <div class="step-label">Customize</div>
+        <div class="step-sublabel">Number, name, colors</div>
+      </div>
+    </div>
+    <div class="step-item" id="step-ind-3" onclick="goStep(3)">
+      <div class="step-num"><span>3</span></div>
+      <div>
+        <div class="step-label">Preview & Confirm</div>
+        <div class="step-sublabel">Verify before ordering</div>
+      </div>
+    </div>
+    <div class="step-item" id="step-ind-4" onclick="goStep(4)">
+      <div class="step-num"><span>4</span></div>
+      <div>
+        <div class="step-label">Add to Cart</div>
+        <div class="step-sublabel">Complete your order</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ──────────────── SCREENS ──────────────── -->
+<div class="screens">
+
+  <!-- ── STEP 1: PRODUCT SELECTION ── -->
+  <div class="screen active" id="screen-1">
+    <div class="s1-wrap">
+      <div class="s1-header">
+        <div class="eyebrow">Step 1 of 4</div>
+        <h1>Choose Your F1 Case</h1>
+        <p>Select the product you want to customise. All cases are printed at 300 DPI.</p>
+      </div>
+      <div class="product-grid">
+        <div class="product-card selected" id="product-verstappen" onclick="selectProduct('verstappen', this)">
+          <div class="product-img-wrap">
+            <div class="css-case-mini">
+              <div class="css-case-mini-num">
+                <span class="mini-n">1</span>
+                <span class="mini-name">VERSTAPPEN</span>
+              </div>
+            </div>
+          </div>
+          <div class="product-name">Max Verstappen Edition</div>
+          <div class="product-desc">Navy base with bold racing number. Red Bull Racing inspired. iPhone 16 compatible.</div>
+          <div class="product-tags">
+            <span class="tag hot">Bestseller</span>
+            <span class="tag">iPhone 16</span>
+            <span class="tag">Snap Case</span>
+          </div>
+        </div>
+        <div class="product-card" id="product-custom" onclick="selectProduct('custom', this)">
+          <div class="product-img-wrap">
+            <div class="css-case-mini css-case-mini-alt">
+              <div class="css-case-mini-num">
+                <span class="mini-n" style="color:#ff6b00;">33</span>
+                <span class="mini-name">YOUR NAME</span>
+              </div>
+            </div>
+          </div>
+          <div class="product-name">Custom Team Livery</div>
+          <div class="product-desc">Choose your team colours, number and driver name. Full personalisation across all grid positions.</div>
+          <div class="product-tags">
+            <span class="tag">All Teams</span>
+            <span class="tag">MagSafe</span>
+            <span class="tag">Tough Case</span>
+          </div>
+        </div>
+        <div class="product-card" id="product-minimal" onclick="selectProduct('minimal', this)">
+          <div class="product-img-wrap">
+            <div class="css-case-mini css-case-mini-alt2">
+              <div class="css-case-mini-num">
+                <span class="mini-n" style="color:#ffffff;-webkit-text-stroke:1px rgba(0,0,0,0.3);">16</span>
+                <span class="mini-name">LECLERC</span>
+              </div>
+            </div>
+          </div>
+          <div class="product-name">Minimal Racing</div>
+          <div class="product-desc">Clean, understated F1 aesthetic. Number and name only — no logos. For the purist.</div>
+          <div class="product-tags">
+            <span class="tag">Minimalist</span>
+            <span class="tag">All Models</span>
+          </div>
+        </div>
+      </div>
+      <div class="s1-cta">
+        <button class="btn-primary" style="max-width:280px;margin:0 auto;" onclick="goStep(2)">
+          Continue to Customize →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 2: CUSTOMIZATION ── -->
+  <div class="screen" id="screen-2">
+    <div class="s2-layout">
+
+      <!-- Left: Live preview -->
+      <div class="preview-panel">
+        <div class="preview-toolbar">
+          <div class="preview-toolbar-left">
+            <button class="toolbar-btn" onclick="zoom(-10)" title="Zoom out">−</button>
+            <span class="zoom-label" id="zoom-label">100%</span>
+            <button class="toolbar-btn" onclick="zoom(10)" title="Zoom in">+</button>
+            <div class="toolbar-divider"></div>
+            <button class="toolbar-btn" onclick="doUndo()" title="Undo">↩</button>
+            <button class="toolbar-btn" onclick="doRedo()" title="Redo">↪</button>
+          </div>
+          <div class="quality-badge">Print quality: 300 DPI</div>
+        </div>
+        <div class="preview-canvas">
+          <div class="loading-overlay" id="loading-overlay">
+            <div class="spinner"></div>
+            <div class="loading-text">Rendering preview…</div>
+          </div>
+          <div class="print-area-wrap" id="print-area-wrap">
+            <div class="print-boundary">
+              <div class="print-boundary-label">Print area</div>
+            </div>
+            <div class="css-case" id="case-img">
+              <div class="css-case-shine"></div>
+            </div>
+            <div class="case-overlay">
+              <div class="overlay-number" id="preview-number" style="color:#cc0000;-webkit-text-stroke:3px #fff;">1</div>
+              <div class="overlay-name" id="preview-name" style="color:#fff;">VERSTAPPEN</div>
+            </div>
+          </div>
+        </div>
+        <div class="preview-footer">
+          <span class="preview-footer-icon">🖨️</span>
+          <span class="preview-footer-text">This is how it prints — exact placement, exact colours</span>
+        </div>
+      </div>
+
+      <!-- Right: Controls -->
+      <div class="controls-panel">
+        <div class="controls-header">
+          <h2>Customize Your Case</h2>
+          <p>Changes reflect live in the preview</p>
+        </div>
+
+        <div class="controls-scroll">
+
+          <!-- 1. Racing number -->
+          <div class="control-group">
+            <div class="control-label">Racing Number</div>
+            <div class="field-wrap">
+              <input
+                class="field-input"
+                id="input-number"
+                type="text"
+                maxlength="2"
+                value="1"
+                placeholder="e.g. 44"
+                oninput="updateNumber(this.value)"
+              />
+              <div class="field-error" id="error-number">⚠ Max 2 digits for print accuracy</div>
+            </div>
+          </div>
+
+          <!-- 2. Font -->
+          <div class="control-group">
+            <div class="control-label">Number Font</div>
+            <div class="font-grid">
+              <div class="font-card selected" onclick="selectFont('Rajdhani', this)">
+                <div class="font-preview" style="font-family:'Rajdhani',sans-serif;">123</div>
+                <div class="font-name">Racing Bold</div>
+              </div>
+              <div class="font-card" onclick="selectFont('Georgia', this)">
+                <div class="font-preview" style="font-family:Georgia,serif;">123</div>
+                <div class="font-name">Classic Serif</div>
+              </div>
+              <div class="font-card" onclick="selectFont('Courier New', this)">
+                <div class="font-preview" style="font-family:'Courier New',monospace;">123</div>
+                <div class="font-name">Mono</div>
+              </div>
+              <div class="font-card" onclick="selectFont('Impact', this)">
+                <div class="font-preview" style="font-family:Impact,sans-serif;">123</div>
+                <div class="font-name">Impact</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Number Color -->
+          <div class="control-group">
+            <div class="control-label">Number Color</div>
+            <div class="color-section">
+              <div class="swatch-grid" id="swatch-grid">
+                <div class="swatch selected" style="background:#cc0000;" onclick="selectColor('#cc0000', this)" title="#cc0000"></div>
+                <div class="swatch" style="background:#ffffff;" onclick="selectColor('#ffffff', this)" title="#ffffff"></div>
+                <div class="swatch" style="background:#ffd200;" onclick="selectColor('#ffd200', this)" title="#ffd200"></div>
+                <div class="swatch" style="background:#1e90ff;" onclick="selectColor('#1e90ff', this)" title="#1e90ff"></div>
+                <div class="swatch" style="background:#00c87a;" onclick="selectColor('#00c87a', this)" title="#00c87a"></div>
+                <div class="swatch" style="background:#ff6b00;" onclick="selectColor('#ff6b00', this)" title="#ff6b00"></div>
+                <div class="swatch" style="background:#000000;border:1px solid #444;" onclick="selectColor('#000000', this)" title="#000000"></div>
+                <div class="swatch" style="background:#8b00ff;" onclick="selectColor('#8b00ff', this)" title="#8b00ff"></div>
+              </div>
+              <div class="hex-wrap">
+                <div class="hex-preview" id="hex-preview" style="background:#cc0000;"></div>
+                <input class="hex-input" id="hex-input" value="#cc0000" maxlength="7" oninput="applyHex(this.value)" />
+              </div>
+              <div class="contrast-warn" id="contrast-warn">⚠ Light colour — may not be visible on the navy background</div>
+            </div>
+          </div>
+
+          <!-- 4. Driver Name -->
+          <div class="control-group">
+            <div class="control-label">
+              Driver Name
+              <span class="char-count" id="name-count">10/20</span>
+            </div>
+            <div class="field-wrap">
+              <input
+                class="field-input"
+                id="input-name"
+                type="text"
+                maxlength="20"
+                value="VERSTAPPEN"
+                placeholder="e.g. HAMILTON"
+                oninput="updateName(this.value)"
+              />
+            </div>
+          </div>
+
+          <!-- 5. Logo -->
+          <div class="control-group">
+            <div class="control-label">Team Logo</div>
+            <div class="logo-tabs">
+              <div class="logo-tab active" id="tab-upload" onclick="switchLogoTab('upload')">Upload Logo</div>
+              <div class="logo-tab" id="tab-preset" onclick="switchLogoTab('preset')">Choose Preset</div>
+            </div>
+            <div id="logo-upload-panel">
+              <div class="logo-upload-zone" onclick="fakeUpload()">
+                <div class="upload-icon">⬆️</div>
+                <div class="upload-text">Drag & drop your logo here<br>PNG, SVG — transparent background preferred</div>
+                <div class="upload-btn-text">or click to browse files</div>
+              </div>
+            </div>
+            <div id="logo-preset-panel" style="display:none;">
+              <div class="preset-grid">
+                <div class="preset-logo selected" onclick="togglePreset(this)" title="Red Bull">🐂</div>
+                <div class="preset-logo" onclick="togglePreset(this)" title="Ferrari">🐎</div>
+                <div class="preset-logo" onclick="togglePreset(this)" title="Mercedes">⭐</div>
+                <div class="preset-logo" onclick="togglePreset(this)" title="McLaren">🟠</div>
+                <div class="preset-logo" onclick="togglePreset(this)" title="Alpine">🔵</div>
+                <div class="preset-logo" onclick="togglePreset(this)" title="No Logo">✕</div>
+              </div>
+            </div>
+            <div class="position-grid-wrap">
+              <div class="position-grid-label">Logo position on case</div>
+              <div class="position-grid" id="pos-grid">
+                <div class="pos-cell" onclick="selectPos(0,this)"></div>
+                <div class="pos-cell" onclick="selectPos(1,this)"></div>
+                <div class="pos-cell" onclick="selectPos(2,this)"></div>
+                <div class="pos-cell" onclick="selectPos(3,this)"></div>
+                <div class="pos-cell" onclick="selectPos(4,this)"></div>
+                <div class="pos-cell" onclick="selectPos(5,this)"></div>
+                <div class="pos-cell selected" onclick="selectPos(6,this)"></div>
+                <div class="pos-cell" onclick="selectPos(7,this)"></div>
+                <div class="pos-cell" onclick="selectPos(8,this)"></div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /controls-scroll -->
+
+        <!-- Footer with order summary -->
+        <div class="controls-footer">
+          <div class="order-strip">
+            <div class="order-strip-item">
+              <div class="order-strip-label">Product</div>
+              <div class="order-strip-value">F1 Snap Case</div>
+            </div>
+            <div class="order-strip-divider"></div>
+            <div class="order-strip-item">
+              <div class="order-strip-label">Customizations</div>
+              <div class="order-strip-value" id="custom-count">5 applied</div>
+            </div>
+            <div class="order-strip-divider"></div>
+            <div class="order-strip-item">
+              <div class="order-strip-label">Price</div>
+              <div class="order-strip-value" style="color:var(--accent);">$34.99</div>
+            </div>
+          </div>
+          <div class="footer-btns">
+            <button class="btn-ghost" onclick="shareDesign(event)" id="share-btn">🔗 Share Design</button>
+            <button class="btn-primary" onclick="goStep(3)">Preview & Confirm →</button>
+          </div>
+        </div>
+
+      </div><!-- /controls-panel -->
+    </div>
+  </div><!-- /screen-2 -->
+
+  <!-- ── STEP 3: PREVIEW & CONFIRM ── -->
+  <div class="screen" id="screen-3">
+    <div class="s3-wrap">
+      <div class="s3-preview-side">
+        <div class="s3-case-wrap">
+          <div class="css-case">
+            <div class="css-case-shine"></div>
+          </div>
+          <div class="s3-overlay">
+            <div class="s3-num" id="s3-number" style="color:#cc0000;-webkit-text-stroke:3px #fff;">1</div>
+            <div class="s3-name" id="s3-name" style="color:#fff;">VERSTAPPEN</div>
+          </div>
+        </div>
+        <div class="s3-dpi-badge">
+          ✅ &nbsp; Print-ready file generated at 300 DPI. Exact colours and placement confirmed.
+        </div>
+      </div>
+
+      <div class="s3-confirm-side">
+        <div>
+          <div class="eyebrow">Step 3 of 4</div>
+          <h2>Does everything look right?</h2>
+          <p>Review your customisations below. Click Edit next to any item to go back and change it. Once you confirm, a print-ready file is locked.</p>
+        </div>
+
+        <div class="checklist">
+          <div class="checklist-item">
+            <div class="check-left">
+              <span class="check-icon">✓</span>
+              <div>
+                <div class="check-label">Product</div>
+                <div class="check-value">Max Verstappen Edition — iPhone 16</div>
+              </div>
+            </div>
+            <span class="check-edit" onclick="goStep(1)">Edit</span>
+          </div>
+          <div class="checklist-item">
+            <div class="check-left">
+              <span class="check-icon">✓</span>
+              <div>
+                <div class="check-label">Racing Number</div>
+                <div class="check-value" id="s3-check-number">#1</div>
+              </div>
+            </div>
+            <span class="check-edit" onclick="goStep(2)">Edit</span>
+          </div>
+          <div class="checklist-item">
+            <div class="check-left">
+              <span class="check-icon">✓</span>
+              <div>
+                <div class="check-label">Driver Name</div>
+                <div class="check-value" id="s3-check-name">VERSTAPPEN</div>
+              </div>
+            </div>
+            <span class="check-edit" onclick="goStep(2)">Edit</span>
+          </div>
+          <div class="checklist-item">
+            <div class="check-left">
+              <span class="check-icon">✓</span>
+              <div>
+                <div class="check-label">Number Color</div>
+                <div class="check-value" id="s3-check-color" style="display:flex;align-items:center;gap:8px;">
+                  <span id="s3-color-dot" style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#cc0000;"></span>
+                  <span id="s3-color-hex">#CC0000</span>
+                </div>
+              </div>
+            </div>
+            <span class="check-edit" onclick="goStep(2)">Edit</span>
+          </div>
+          <div class="checklist-item">
+            <div class="check-left">
+              <span class="check-icon">✓</span>
+              <div>
+                <div class="check-label">Team Logo</div>
+                <div class="check-value">Red Bull Racing (bottom-left)</div>
+              </div>
+            </div>
+            <span class="check-edit" onclick="goStep(2)">Edit</span>
+          </div>
+          <div class="checklist-item">
+            <div class="check-left">
+              <span class="check-icon">✓</span>
+              <div>
+                <div class="check-label">Print Quality</div>
+                <div class="check-value" style="color:var(--green);">300 DPI — production ready</div>
+              </div>
+            </div>
+            <span style="font-size:12px;color:var(--text-muted);">Auto</span>
+          </div>
+        </div>
+
+        <div class="s3-cta-wrap">
+          <button class="btn-large" onclick="goStep(4)">
+            🛒 &nbsp; Add to Cart — $34.99
+          </button>
+          <div class="s3-note">
+            🔒 &nbsp; Design is locked on confirm. Print file delivered with your order.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /screen-3 -->
+
+  <!-- ── STEP 4: ADD TO CART ── -->
+  <div class="screen" id="screen-4">
+    <div class="s4-wrap">
+      <div class="s4-success-ring">✅</div>
+      <h1>Design Confirmed!</h1>
+      <p>Your print-ready file has been generated and locked. It'll ship with your order — no back-and-forth, no guesswork.</p>
+
+      <div class="s4-summary">
+        <div class="s4-summary-title">Order Summary</div>
+        <div class="s4-row">
+          <span class="s4-row-label">Product</span>
+          <span class="s4-row-val">Max Verstappen Edition — iPhone 16</span>
+        </div>
+        <div class="s4-row">
+          <span class="s4-row-label">Racing Number</span>
+          <span class="s4-row-val" id="s4-number">#1</span>
+        </div>
+        <div class="s4-row">
+          <span class="s4-row-label">Driver Name</span>
+          <span class="s4-row-val" id="s4-name">VERSTAPPEN</span>
+        </div>
+        <div class="s4-row">
+          <span class="s4-row-label">Number Color</span>
+          <span class="s4-row-val" id="s4-color" style="display:flex;align-items:center;gap:8px;">
+            <span id="s4-color-dot" style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#cc0000;"></span>
+            <span>#CC0000</span>
+          </span>
+        </div>
+        <div class="s4-row">
+          <span class="s4-row-label">Print File</span>
+          <span class="s4-row-val" style="color:var(--green);">300 DPI — Ready</span>
+        </div>
+        <div class="s4-price-row">
+          <span class="s4-total">Total</span>
+          <span class="s4-price">$34.99</span>
+        </div>
+      </div>
+
+      <div class="s4-btns">
+        <button class="btn-cart" onclick="fakeCart()">🛒 &nbsp; Add to Cart</button>
+        <button class="btn-outline" onclick="goStep(1)">← Customise Another Case</button>
+      </div>
+
+      <div class="s4-powered">
+        Powered by
+        <span class="pk-pill">PreviewKit</span>
+        — print infrastructure for custom stores
+      </div>
+    </div>
+  </div><!-- /screen-4 -->
+
+</div><!-- /screens -->
+
+<script>
+  // ── STATE ──
+  const state = {
+    number: '1',
+    name: 'VERSTAPPEN',
+    color: '#cc0000',
+    font: 'Rajdhani',
+    zoom: 100,
+    history: [],
+    historyIndex: -1,
+  };
+
+  function saveHistory() {
+    const snapshot = { ...state };
+    state.history = state.history.slice(0, state.historyIndex + 1);
+    state.history.push(snapshot);
+    state.historyIndex = state.history.length - 1;
+  }
+  saveHistory();
+
+  // ── NAVIGATION ──
+  let currentStep = 1;
+  const maxReached = { 1: true, 2: false, 3: false, 4: false };
+
+  function goStep(n) {
+    if (n > 1 && !maxReached[1]) return;
+    syncPreviewToStep3();
+    syncToStep4();
+
+    document.getElementById('screen-' + currentStep).classList.remove('active');
+    document.getElementById('screen-' + n).classList.add('active');
+
+    // Update step indicators
+    for (let i = 1; i <= 4; i++) {
+      const el = document.getElementById('step-ind-' + i);
+      el.classList.remove('active', 'done');
+      if (i < n) el.classList.add('done');
+      else if (i === n) el.classList.add('active');
+    }
+    currentStep = n;
+    maxReached[n] = true;
+    window.scrollTo(0, 0);
+  }
+
+  // ── PRODUCT SELECTION ──
+  function selectProduct(id, el) {
+    document.querySelectorAll('.product-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  // ── ZOOM ──
+  function zoom(delta) {
+    state.zoom = Math.min(200, Math.max(50, state.zoom + delta));
+    document.getElementById('zoom-label').textContent = state.zoom + '%';
+    document.getElementById('print-area-wrap').style.transform = 'scale(' + (state.zoom / 100) + ')';
+  }
+
+  // ── UNDO / REDO ──
+  function doUndo() {
+    if (state.historyIndex > 0) {
+      state.historyIndex--;
+      applyState(state.history[state.historyIndex]);
+    }
+  }
+  function doRedo() {
+    if (state.historyIndex < state.history.length - 1) {
+      state.historyIndex++;
+      applyState(state.history[state.historyIndex]);
+    }
+  }
+  function applyState(s) {
+    state.number = s.number;
+    state.name = s.name;
+    state.color = s.color;
+    state.font = s.font;
+    document.getElementById('input-number').value = s.number;
+    document.getElementById('input-name').value = s.name;
+    document.getElementById('hex-input').value = s.color;
+    updatePreview();
+  }
+
+  // ── NUMBER ──
+  let numberTimer;
+  function updateNumber(val) {
+    const cleaned = val.replace(/[^0-9]/g, '').slice(0, 2);
+    document.getElementById('input-number').value = cleaned;
+    const errEl = document.getElementById('error-number');
+    if (val.length > 0 && cleaned !== val) {
+      errEl.classList.add('visible');
+      document.getElementById('input-number').classList.add('error');
+    } else {
+      errEl.classList.remove('visible');
+      document.getElementById('input-number').classList.remove('error');
+    }
+    state.number = cleaned || '?';
+    triggerRender();
+  }
+
+  // ── FONT ──
+  function selectFont(font, el) {
+    document.querySelectorAll('.font-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    state.font = font;
+    triggerRender();
+  }
+
+  // ── COLOR ──
+  function selectColor(hex, el) {
+    document.querySelectorAll('.swatch').forEach(s => s.classList.remove('selected'));
+    el.classList.add('selected');
+    state.color = hex;
+    document.getElementById('hex-input').value = hex;
+    document.getElementById('hex-preview').style.background = hex;
+    checkContrast(hex);
+    triggerRender();
+  }
+
+  function applyHex(val) {
+    if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+      state.color = val;
+      document.getElementById('hex-preview').style.background = val;
+      document.querySelectorAll('.swatch').forEach(s => s.classList.remove('selected'));
+      checkContrast(val);
+      triggerRender();
+    }
+  }
+
+  function checkContrast(hex) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    const warn = document.getElementById('contrast-warn');
+    if (lum > 0.75) warn.classList.add('visible');
+    else warn.classList.remove('visible');
+  }
+
+  // ── NAME ──
+  function updateName(val) {
+    state.name = val.toUpperCase();
+    document.getElementById('input-name').value = state.name;
+    document.getElementById('name-count').textContent = val.length + '/20';
+    triggerRender();
+  }
+
+  // ── LOGO TABS ──
+  function switchLogoTab(tab) {
+    document.getElementById('tab-upload').classList.toggle('active', tab === 'upload');
+    document.getElementById('tab-preset').classList.toggle('active', tab === 'preset');
+    document.getElementById('logo-upload-panel').style.display = tab === 'upload' ? '' : 'none';
+    document.getElementById('logo-preset-panel').style.display = tab === 'preset' ? '' : 'none';
+  }
+
+  function fakeUpload() {
+    alert('In the live widget, this opens the file picker. Supported: PNG, SVG (max 5 MB, transparent background recommended).');
+  }
+
+  function togglePreset(el) {
+    document.querySelectorAll('.preset-logo').forEach(p => p.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  // ── POSITION GRID ──
+  function selectPos(idx, el) {
+    document.querySelectorAll('.pos-cell').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  // ── RENDER (with loading shimmer) ──
+  let renderTimer;
+  function triggerRender() {
+    clearTimeout(renderTimer);
+    const overlay = document.getElementById('loading-overlay');
+    overlay.classList.add('visible');
+    renderTimer = setTimeout(() => {
+      updatePreview();
+      overlay.classList.remove('visible');
+      saveHistory();
+    }, 450);
+  }
+
+  function updatePreview() {
+    const numEl = document.getElementById('preview-number');
+    const nameEl = document.getElementById('preview-name');
+    numEl.textContent = state.number || '?';
+    numEl.style.color = state.color;
+    numEl.style.fontFamily = "'" + state.font + "', sans-serif";
+    nameEl.textContent = state.name || 'YOUR NAME';
+    numEl.style.webkitTextStroke = '3px rgba(255,255,255,0.8)';
+  }
+
+  // ── SYNC TO STEP 3 ──
+  function syncPreviewToStep3() {
+    document.getElementById('s3-number').textContent = state.number;
+    document.getElementById('s3-number').style.color = state.color;
+    document.getElementById('s3-name').textContent = state.name;
+    document.getElementById('s3-check-number').textContent = '#' + state.number;
+    document.getElementById('s3-check-name').textContent = state.name;
+    document.getElementById('s3-color-dot').style.background = state.color;
+    document.getElementById('s3-color-hex').textContent = state.color.toUpperCase();
+  }
+
+  // ── SYNC TO STEP 4 ──
+  function syncToStep4() {
+    document.getElementById('s4-number').textContent = '#' + state.number;
+    document.getElementById('s4-name').textContent = state.name;
+    document.getElementById('s4-color-dot').style.background = state.color;
+  }
+
+  // ── SHARE URL GENERATION ──
+  function buildShareUrl() {
+    const base = window.location.origin + window.location.pathname;
+    const params = new URLSearchParams({
+      n:    state.number,
+      name: state.name,
+      color: state.color,
+      font: state.font,
+    });
+    return base + '?' + params.toString();
+  }
+
+  // ── OPEN SHARE MODAL ──
+  function shareDesign(e) {
+    const url = buildShareUrl();
+
+    // Populate modal preview
+    document.getElementById('share-prev-num').textContent = state.number || '?';
+    document.getElementById('share-prev-num').style.color = state.color;
+    document.getElementById('share-prev-name').textContent = state.name || 'YOUR NAME';
+    document.getElementById('share-prev-meta').textContent =
+      state.font + ' · ' + state.color.toUpperCase() + ' · F1 Snap Case';
+    document.getElementById('share-color-swatch').style.background = state.color;
+    document.getElementById('share-url-input').value = url;
+
+    // Reset copy button
+    const copyBtn = document.getElementById('share-copy-btn');
+    copyBtn.textContent = 'Copy link';
+    copyBtn.classList.remove('copied');
+
+    document.getElementById('share-backdrop').classList.add('visible');
+  }
+
+  function closeShareModal(e) {
+    if (e && e.target !== document.getElementById('share-backdrop')) return;
+    document.getElementById('share-backdrop').classList.remove('visible');
+  }
+
+  // ── COPY TO CLIPBOARD ──
+  function copyShareUrl() {
+    const url = document.getElementById('share-url-input').value;
+    navigator.clipboard.writeText(url).then(() => {
+      const btn = document.getElementById('share-copy-btn');
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      showToast('✓ Link copied to clipboard!');
+      setTimeout(() => {
+        btn.textContent = 'Copy link';
+        btn.classList.remove('copied');
+      }, 2500);
+    }).catch(() => {
+      // Fallback for older browsers
+      const input = document.getElementById('share-url-input');
+      input.select();
+      document.execCommand('copy');
+      showToast('✓ Link copied!');
+    });
+  }
+
+  // ── SHARE OPTIONS ──
+  function shareViaWhatsApp() {
+    const url = buildShareUrl();
+    const msg = encodeURIComponent('Check out this F1 phone case design I made: ' + url);
+    window.open('https://wa.me/?text=' + msg, '_blank');
+  }
+
+  function shareViaEmail() {
+    const url = buildShareUrl();
+    const subject = encodeURIComponent('My F1 Phone Case Design — #' + state.number + ' ' + state.name);
+    const body = encodeURIComponent('Hey! I customised an F1 phone case and wanted to share it with you.\n\nOpen this link to see (and edit) the design:\n' + url + '\n\nPowered by PreviewKit.');
+    window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
+  }
+
+  function shareNative() {
+    const url = buildShareUrl();
+    if (navigator.share) {
+      navigator.share({
+        title: 'My F1 Phone Case — #' + state.number + ' ' + state.name,
+        text: 'Check out this F1 phone case design I made with PreviewKit!',
+        url: url,
+      }).catch(() => {});
+    } else {
+      copyShareUrl();
+    }
+  }
+
+  // ── TOAST ──
+  let toastTimer;
+  function showToast(msg) {
+    const toast = document.getElementById('pk-toast');
+    toast.textContent = msg;
+    toast.classList.add('visible');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('visible'), 3000);
+  }
+
+  // ── CART ──
+  function fakeCart() {
+    const btn = event.target;
+    btn.textContent = '✓ Added to Cart!';
+    btn.style.background = 'var(--green)';
+    setTimeout(() => { btn.textContent = '🛒  Add to Cart'; btn.style.background = ''; }, 2500);
+  }
+
+  // ── LOAD STATE FROM URL PARAMS ──
+  function loadFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const n    = params.get('n');
+    const name = params.get('name');
+    const color = params.get('color');
+    const font = params.get('font');
+
+    if (!n && !name && !color && !font) return; // nothing to restore
+
+    if (n)    { state.number = n.slice(0, 2); document.getElementById('input-number').value = state.number; }
+    if (name) { state.name = name.toUpperCase().slice(0, 20); document.getElementById('input-name').value = state.name; document.getElementById('name-count').textContent = state.name.length + '/20'; }
+    if (color && /^#[0-9a-fA-F]{6}$/.test(color)) {
+      state.color = color;
+      document.getElementById('hex-input').value = color;
+      document.getElementById('hex-preview').style.background = color;
+      document.querySelectorAll('.swatch').forEach(s => {
+        s.classList.toggle('selected', s.title === color);
+      });
+      checkContrast(color);
+    }
+    if (font) {
+      state.font = font;
+      document.querySelectorAll('.font-card').forEach(card => {
+        const matches = card.querySelector('.font-preview').style.fontFamily.includes(font);
+        card.classList.toggle('selected', matches);
+      });
+    }
+
+    updatePreview();
+    saveHistory();
+
+    // Show restored banner
+    document.getElementById('restored-banner').classList.add('visible');
+
+    // Jump straight to step 2 so they land on the customizer
+    setTimeout(() => goStep(2), 100);
+  }
+
+  // Init
+  updatePreview();
+  loadFromUrl();
+</script>
+</body>
+</html>
